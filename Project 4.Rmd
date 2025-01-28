@@ -1,0 +1,58 @@
+---
+title: "Project4"
+author: "Saad"
+date: "2024-04-23"
+output: html_document
+---
+
+Loading in the data. I tried using fread() but it changed the variable type for my time variable.
+```{r}
+library(readr)
+library(dplyr)
+library(ggplot2)
+
+weather <- read_csv("../data/finalprojectdata.csv")
+```
+
+
+This scatter plot with a regression line shows the correlation between temperature and humidity. This graph illustrates a negative correlation between temperature and humidity at 2 meters above ground. As temperature increases, relative humidity tends to decrease, as shown by the descending red trend line.
+
+I maximized computational efficiency by ensuring that no standard error calculation is performed (se = FALSE). The linear model calculation (geom_smooth()) can be very resource-intensive, especially with large datasets. The color mapping in geom_point() has been removed because it redundantly encodes the same information as the x-axis. The time it took was .02 seconds.
+```{r}
+# Measure the execution time
+system.time({
+    # Create the plot
+weather |>
+  ggplot(aes(x = temperature_2m, y = relative_humidity_2m)) +
+  geom_point() + # Removed color mapping to temperature as it might be redundant
+  geom_smooth(method = "lm", se = FALSE, color = "red") +
+  labs(title = "Relationship Between Temperature and Humidity at 2 meters above ground", 
+       x = "Temperature (°C)", y = "Relative Humidity (%)", color = "Temperature (°C)") 
+})
+```
+
+This plot tracks temperature over time and highlights instances of precipitation, shown as colored points. Notably, precipitation events are depicted at lower temperatures, with just three occurrences visibly marked on the graph, demonstrating a trend of precipitation coinciding with cooler conditions.
+ 
+By computing the precip_color in advance, you avoid the costly operation of recalculating this for every point during the plotting process.
+Additonally by setting na.rm = TRUE in geom_point(), it ensures that ggplot2 doesn't waste resources trying to plot NA values. The time it took was .01 seconds.
+```{r}
+# Precompute the precipitation color mapping
+weather <- weather |>
+  mutate(precip_color = ifelse(precipitation > 0, precipitation, NA))
+# Measure the execution time
+system.time({
+# Create the plot
+weather |>
+  ggplot(aes(x = time, y = temperature_2m)) +
+  geom_line() +  # Add line for temperature
+  geom_point(aes(color = precip_color), size = 2, na.rm = TRUE) + 
+  labs(title = "Temperature Over Time with Precipitation",
+       x = "Date",
+       y = "Temperature (°C)",
+       color = "Precipitation in mm") +
+  scale_color_gradient(low = "blue", na.value = NA)
+})
+```
+
+```
+

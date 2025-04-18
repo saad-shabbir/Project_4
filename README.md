@@ -2,7 +2,7 @@
 
 ## Background and Overview
 
-This project delivers actionable insights using rich customer data from **Mattson Nutrition**. The dataset captures behavioral, demographic, psychological, and health data across two reference periods:
+This project delivers actionable insights using rich customer data from a proprietary nutrition-focused behavioral dataset provided by a health-tech company. The dataset captures behavioral, demographic, psychological, and health data across two reference periods:
 
 - **Delta1**: 3 months prior  
 - **Delta2**: 6 months prior
